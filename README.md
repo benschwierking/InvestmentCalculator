@@ -2,6 +2,24 @@
 
 InvestmentCalculator helps you estimate the complete return on a rental property and compare it with alternatives such as stocks, bonds, CDs, or savings accounts.
 
+## Run the app
+
+The app is dependency-free. From this directory, run:
+
+```sh
+python3 -m http.server 4173
+```
+
+Then open `http://localhost:4173`. You can also use `npm start` if Node is installed.
+
+Financial calculations live in `finance.js` as pure functions. Run the edge-case and integration tests with:
+
+```sh
+npm test
+```
+
+Scenarios are stored only in your browser's local storage. CSV exports are generated locally; Print / PDF uses the browser's print dialog.
+
 ## What It Calculates
 
 The calculator combines four sources of real-estate return:

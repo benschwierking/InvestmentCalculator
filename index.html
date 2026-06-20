@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0c1714">
+  <title>InvestmentCalculator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="InvestmentCalculator home"><span class="brand-mark">IC</span><span>InvestmentCalculator</span></a>
+    <div class="scenario-tools">
+      <label class="sr-only" for="scenario-select">Saved scenario</label>
+      <select id="scenario-select" aria-label="Saved scenario"><option value="">Unsaved scenario</option></select>
+      <button class="button ghost" id="save-scenario">Save</button>
+      <button class="button ghost" id="duplicate-scenario">Duplicate</button>
+      <span class="saved-state" id="saved-state" aria-live="polite"></span>
+    </div>
+  </header>
+
+  <main id="top">
+    <aside class="rail" aria-label="Calculator sections">
+      <div class="rail-intro"><p class="eyebrow">Scenario model</p><h1>See the whole return.</h1><p>Property equity, cash flow, taxes, and opportunity cost—in one view.</p></div>
+      <nav>
+        <a href="#property"><span>01</span>Property</a><a href="#mortgage"><span>02</span>Mortgage</a>
+        <a href="#income"><span>03</span>Income & expenses</a><a href="#taxes"><span>04</span>Taxes</a>
+        <a href="#sale"><span>05</span>Sale</a><a href="#alternative"><span>06</span>Alternative</a>
+        <a href="#results"><span>07</span>Results</a>
+      </nav>
+      <div class="rail-note"><span class="pulse"></span><span>Results update live</span></div>
+    </aside>
+
+    <div class="workspace">
+      <section class="section" id="property">
+        <div class="section-heading"><div><p class="eyebrow">01 · Foundation</p><h2>Property</h2></div><p>Start with the acquisition and your expected hold.</p></div>
+        <div class="input-grid">
+          <label>Purchase price <span class="tip" title="Contract price before closing costs.">?</span><span class="input money"><i>$</i><input id="purchasePrice" type="number" min="0" step="1000" value="450000"></span></label>
+          <label>Current property value <span class="tip" title="Use purchase price for a new acquisition.">?</span><span class="input money"><i>$</i><input id="currentValue" type="number" min="0" step="1000" value="450000"></span></label>
+          <label>Purchase / mortgage date<span class="input"><input id="startDate" type="date" value="2026-01-01"></span></label>
+          <label>Expected holding period<span class="input suffix"><input id="holdingYears" type="number" min="0.1" max="50" step="0.5" value="10"><i>years</i></span></label>
+          <label>Expected annual appreciation<span class="input suffix"><input id="appreciationRate" type="number" min="-100" max="100" step="0.1" value="3"><i>%</i></span></label>
+          <label>Other acquisition costs<span class="input money"><i>$</i><input id="otherAcquisitionCosts" type="number" min="0" step="100" value="0"></span></label>
+        </div>
+      </section>
+
+      <section class="section" id="mortgage">
+        <div class="section-heading"><div><p class="eyebrow">02 · Financing</p><h2>Mortgage</h2></div><p>Extra payments go directly to principal.</p></div>
+        <div class="input-grid">
+          <label>Down payment<span class="input money"><i>$</i><input id="downPayment" type="number" min="0" step="1000" value="90000"></span></label>
+          <label>Loan term<span class="input suffix"><input id="loanTermYears" type="number" min="1" max="50" value="30"><i>years</i></span></label>
+          <label>Mortgage interest rate<span class="input suffix"><input id="mortgageRate" type="number" min="0" max="50" step="0.01" value="6.5"><i>%</i></span></label>
+          <label>Extra monthly principal<span class="input money"><i>$</i><input id="extraMonthly" type="number" min="0" step="25" value="0"></span></label>
+          <label>Extra annual principal<span class="input money"><i>$</i><input id="extraAnnual" type="number" min="0" step="100" value="0"></span></label>
+          <label>Annual extra payment month<span class="input"><select id="annualExtraMonth"><option value="12">December</option><option value="1">January</option><option value="6">June</option></select></span></label>
+        </div>
+        <label class="check"><input id="biweekly" type="checkbox"><span>Use a biweekly payment strategy</span><small>Models one additional scheduled payment per year.</small></label>
+        <div class="subpanel">
+          <div class="subpanel-head"><div><h3>One-time principal payments</h3><p>Add dated lump-sum payments.</p></div><button class="button ghost" id="add-payment">+ Add payment</button></div>
+          <div id="one-time-list" class="one-time-list"><p class="empty">No one-time payments added.</p></div>
+        </div>
+      </section>
+
+      <section class="section" id="income">
+        <div class="section-heading"><div><p class="eyebrow">03 · Operations</p><h2>Income & expenses</h2></div><p>Monthly values unless marked annual.</p></div>
+        <h3 class="group-title">Income · monthly</h3>
+        <div class="input-grid two">
+          <label>Rental income<span class="input money"><i>$</i><input id="rent" type="number" min="0" step="50" value="3200"></span></label>
+          <label>Other property income<span class="input money"><i>$</i><input id="otherIncome" type="number" min="0" step="25" value="0"></span></label>
+        </div>
+        <h3 class="group-title">Operating expenses</h3>
+        <div class="input-grid">
+          <label>Property taxes · annual<span class="input money"><i>$</i><input id="propertyTaxes" type="number" min="0" step="100" value="5400"></span></label>
+          <label>Insurance · annual<span class="input money"><i>$</i><input id="insurance" type="number" min="0" step="100" value="1800"></span></label>
+          <label>PMI · monthly <span class="tip" title="Automatically stops below 80% loan-to-value in this model.">?</span><span class="input money"><i>$</i><input id="pmi" type="number" min="0" step="10" value="0"></span></label>
+          <label>HOA · monthly<span class="input money"><i>$</i><input id="hoa" type="number" min="0" step="10" value="0"></span></label>
+          <label>Property management · monthly<span class="input money"><i>$</i><input id="management" type="number" min="0" step="10" value="256"></span></label>
+          <label>Maintenance & repairs · monthly<span class="input money"><i>$</i><input id="maintenance" type="number" min="0" step="10" value="300"></span></label>
+          <label>Vacancy allowance · monthly<span class="input money"><i>$</i><input id="vacancy" type="number" min="0" step="10" value="160"></span></label>
+          <label>Legal & professional · monthly<span class="input money"><i>$</i><input id="legal" type="number" min="0" step="10" value="0"></span></label>
+          <label>Owner-paid utilities · monthly<span class="input money"><i>$</i><input id="utilities" type="number" min="0" step="10" value="0"></span></label>
+          <label>Other recurring · monthly<span class="input money"><i>$</i><input id="otherExpenses" type="number" min="0" step="10" value="0"></span></label>
+        </div>
+        <h3 class="group-title">Upfront costs</h3>
+        <div class="input-grid two">
+          <label>Closing costs<span class="input money"><i>$</i><input id="closingCosts" type="number" min="0" step="100" value="9000"></span></label>
+          <label>Initial renovations<span class="input money"><i>$</i><input id="renovationCosts" type="number" min="0" step="100" value="10000"></span></label>
+        </div>
+      </section>
+
+      <section class="section" id="taxes">
+        <div class="section-heading"><div><p class="eyebrow">04 · Estimate</p><h2>Taxes</h2></div><p>Editable assumptions—not tax advice.</p></div>
+        <div class="input-grid">
+          <label>Federal marginal rate<span class="input suffix"><input id="federalTaxRate" type="number" min="0" max="100" step="0.1" value="24"><i>%</i></span></label>
+          <label>State marginal rate<span class="input suffix"><input id="stateTaxRate" type="number" min="0" max="100" step="0.1" value="5"><i>%</i></span></label>
+          <label>Depreciable basis <span class="tip" title="Building basis excluding land; edit for your circumstances.">?</span><span class="input money"><i>$</i><input id="depreciableBasis" type="number" min="0" step="1000" value="360000"></span></label>
+          <label>Recovery period<span class="input suffix"><input id="recoveryYears" type="number" min="1" max="50" step="0.5" value="27.5"><i>years</i></span></label>
+        </div>
+        <p class="info-note">This estimate models mortgage interest, property taxes, insurance, repairs, management, professional fees, other eligible operating expenses, and depreciation. Eligibility varies. See <a href="https://www.irs.gov/publications/p527" target="_blank" rel="noreferrer">IRS Publication 527</a> and consult a tax professional.</p>
+      </section>
+
+      <section class="section" id="sale">
+        <div class="section-heading"><div><p class="eyebrow">05 · Exit</p><h2>Sale assumptions</h2></div><p>Model the cost of turning equity into cash.</p></div>
+        <label class="check"><input id="includeSale" type="checkbox" checked><span>Include a sale at the end of the holding period</span></label>
+        <p class="sale-date">Expected sale date <strong id="expected-sale-date">—</strong></p>
+        <div class="input-grid sale-fields">
+          <label>Selling costs<span class="input suffix"><input id="sellingCostRate" type="number" min="0" max="100" step="0.1" value="6"><i>%</i></span></label>
+          <label>Capital-gains tax rate<span class="input suffix"><input id="capitalGainsRate" type="number" min="0" max="100" step="0.1" value="15"><i>%</i></span></label>
+          <label>Depreciation recapture rate<span class="input suffix"><input id="recaptureRate" type="number" min="0" max="100" step="0.1" value="25"><i>%</i></span></label>
+        </div>
+      </section>
+
+      <section class="section" id="alternative">
+        <div class="section-heading"><div><p class="eyebrow">06 · Benchmark</p><h2>Alternative investment</h2></div><p>Uses the same time horizon and matching cash needs.</p></div>
+        <div class="input-grid">
+          <label>Initial investment <span class="tip" title="Leave at $0 to match the property's initial cash automatically.">?</span><span class="input money"><i>$</i><input id="altInitial" type="number" min="0" step="1000" value="0"></span></label>
+          <label>Additional recurring contribution<span class="input money"><i>$</i><input id="altContribution" type="number" min="0" step="25" value="0"></span></label>
+          <label>Contribution frequency<span class="input"><select id="altContributionFrequency"><option value="monthly">Monthly</option><option value="annual">Annual</option></select></span></label>
+          <label>Expected annual return<span class="input suffix"><input id="altReturn" type="number" min="-100" max="100" step="0.1" value="7"><i>%</i></span></label>
+          <label>Compounding frequency<span class="input"><select id="altCompounds"><option value="12">Monthly</option><option value="4">Quarterly</option><option value="1">Annually</option></select></span></label>
+          <label>Annual management fee<span class="input suffix"><input id="altFeeRate" type="number" min="0" max="100" step="0.01" value="0.25"><i>%</i></span></label>
+          <label>Tax rate on gains<span class="input suffix"><input id="altTaxRate" type="number" min="0" max="100" step="0.1" value="15"><i>%</i></span></label>
+        </div>
+        <p class="info-note">Any negative property cash flow and optional extra principal payments are automatically invested in the alternative too, keeping contributions equivalent.</p>
+      </section>
+
+      <section class="results section" id="results">
+        <div class="section-heading results-head"><div><p class="eyebrow">07 · Projection</p><h2>Results</h2></div><div class="export-actions"><button class="button ghost" id="export-csv">Export CSV</button><button class="button primary" id="export-pdf">Print / PDF</button></div></div>
+        <div id="validation" class="validation" role="alert" hidden></div>
+        <div class="hero-result">
+          <div><p class="label">Projected real-estate return</p><strong id="total-return">—</strong><span id="total-return-rate">—</span></div>
+          <div class="hero-meta"><div><small>Annualized return</small><b id="annualized">—</b></div><div><small>Estimated IRR</small><b id="irr">—</b></div><div><small>Cash-on-cash</small><b id="cash-on-cash">—</b></div></div>
+        </div>
+        <div class="metric-grid" id="return-components"></div>
+
+        <div class="comparison">
+          <div class="comparison-head"><div><p class="eyebrow">Equivalent cash-flow comparison</p><h3>Ending wealth</h3></div><div class="opportunity"><span id="opportunity-label">Real estate leads by</span><strong id="opportunity-cost">—</strong></div></div>
+          <div class="wealth-bars"><div><div class="bar-label"><span>Real estate</span><b id="real-estate-wealth">—</b></div><div class="track"><i id="real-bar"></i></div></div><div><div class="bar-label"><span>Alternative</span><b id="alt-wealth">—</b></div><div class="track"><i id="alt-bar"></i></div></div></div>
+          <div class="comparison-grid" id="comparison-grid"></div>
+          <p class="liquidity"><b>Liquidity note:</b> Real estate is generally less liquid and carries transaction, concentration, and operating risks. Market investments may be easier to sell but remain volatile.</p>
+        </div>
+
+        <div class="chart-grid">
+          <article class="chart-card"><div><p class="eyebrow">Balance sheet</p><h3>Equity growth & loan balance</h3></div><div id="equity-chart" class="chart" aria-label="Equity growth and loan balance chart"></div></article>
+          <article class="chart-card"><div><p class="eyebrow">Operations</p><h3>Cumulative cash flow</h3></div><div id="cash-chart" class="chart" aria-label="Cumulative cash flow chart"></div></article>
+        </div>
+
+        <div class="table-card"><div class="table-head"><div><p class="eyebrow">Year by year</p><h3>Annual cash flow</h3></div></div><div class="table-scroll"><table><thead><tr><th>Year</th><th>Income</th><th>Operating expenses</th><th>Debt service</th><th>Net cash flow</th><th>Tax benefit*</th><th>Equity</th></tr></thead><tbody id="annual-body"></tbody></table></div></div>
+        <details class="table-card"><summary><div><p class="eyebrow">Month by month</p><h3>Mortgage amortization</h3></div><span>Expand table</span></summary><div class="table-scroll"><table><thead><tr><th>Payment</th><th>Date</th><th>Total payment</th><th>Interest</th><th>Scheduled principal</th><th>Extra principal</th><th>Remaining balance</th></tr></thead><tbody id="amortization-body"></tbody></table></div></details>
+        <p class="disclaimer">This calculator provides estimates for educational purposes and does not constitute financial, tax, legal, or investment advice. Tax treatment depends on individual circumstances and applicable law. Consult qualified professionals before making investment decisions. Projections are not guaranteed.</p>
+      </section>
+    </div>
+  </main>
+  <div class="mobile-jump"><a href="#results">View live results <strong id="mobile-result">—</strong></a></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
